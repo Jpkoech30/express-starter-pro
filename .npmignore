@@ -1,0 +1,8 @@
+__tests__/
+examples/
+config/
+.husky/
+.eslintrc.js
+.prettierrc
+jest.config.js
+nodemon.json

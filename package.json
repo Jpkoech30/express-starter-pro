@@ -1,0 +1,94 @@
+{
+  "name": "express-starter-kit",
+  "version": "1.0.0",
+  "description": "Production-ready Express.js application starter kit with Sequelize, metrics, logging, and CLI scaffolding",
+  "main": "index.js",
+  "exports": {
+    ".": {
+      "import": "./index.mjs",
+      "require": "./index.js"
+    }
+  },
+  "bin": {
+    "express-starter-kit": "./cli.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon src/create-app.js",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
+    "lint": "eslint . --ext .js,.mjs",
+    "lint:fix": "eslint . --ext .js,.mjs --fix",
+    "format": "prettier --write \"**/*.{js,mjs,json,md}\"",
+    "prepare": "husky install"
+  },
+  "keywords": [
+    "express",
+    "starter-kit",
+    "sequelize",
+    "prometheus",
+    "middleware",
+    "scaffold"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "express-session": "^1.18.0",
+    "helmet": "^7.1.0",
+    "hpp": "^0.2.3",
+    "morgan": "^1.10.0",
+    "on-finished": "^2.4.1",
+    "prom-client": "^15.0.0",
+    "redis": "^4.6.0",
+    "sequelize": "^6.35.0",
+    "xss": "^1.0.14",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/supertest": "^2.0.12",
+    "eslint": "^8.50.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.28.0",
+    "husky": "^8.0.0",
+    "jest": "^29.7.0",
+    "lint-staged": "^15.0.0",
+    "nodemon": "^3.0.0",
+    "prettier": "^3.0.0",
+    "sqlite3": "^5.1.0",
+    "supertest": "^6.3.0"
+  },
+  "lint-staged": {
+    "*.{js,mjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coverageThreshold": {
+      "global": {
+        "branches": 55,
+        "functions": 65,
+        "lines": 75,
+        "statements": 70
+      }
+    },
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/examples/"
+    ]
+  }
+}
