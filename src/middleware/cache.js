@@ -168,7 +168,9 @@ function createCacheMiddleware(config, redisClient) {
     };
   }
 
-  return { cacheMiddleware, etagMiddleware, staticCacheMiddleware, store };
+  return {
+    cacheMiddleware, etagMiddleware, staticCacheMiddleware, store,
+  };
 }
 
 module.exports = { createCacheMiddleware };

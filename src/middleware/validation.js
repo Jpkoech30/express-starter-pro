@@ -22,7 +22,7 @@ function createValidationMiddleware(schemas = {}) {
             throw err;
           }
           req.body = result.data;
-        })
+        }),
       );
     }
 
@@ -40,7 +40,7 @@ function createValidationMiddleware(schemas = {}) {
             throw err;
           }
           req.query = result.data;
-        })
+        }),
       );
     }
 
@@ -58,7 +58,7 @@ function createValidationMiddleware(schemas = {}) {
             throw err;
           }
           req.params = result.data;
-        })
+        }),
       );
     }
 

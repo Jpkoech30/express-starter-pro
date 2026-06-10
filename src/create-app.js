@@ -253,8 +253,9 @@ async function createApp(userConfig = {}) {
   // Central error handler
   app.use(createErrorHandler(config));
 
-// Shutdown — server reference set later via setServer()
-  const { shutdown, registerShutdownHandlers, setServer } = createShutdownHandler(null, sequelize, redisClient, logger, config);
+  // Shutdown — server reference set later via setServer()
+  const shutdownHandler = createShutdownHandler(null, sequelize, redisClient, logger, config);
+  const { shutdown, registerShutdownHandlers, setServer } = shutdownHandler;
 
   registerShutdownHandlers();
 

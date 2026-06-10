@@ -2,7 +2,7 @@
 
 const path = require('path');
 const fs = require('fs');
-const { Sequelize, DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 
 async function loadModels(sequelize, globPattern) {
   const models = {};

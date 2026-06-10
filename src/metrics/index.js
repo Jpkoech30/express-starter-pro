@@ -2,7 +2,7 @@
 
 const promClient = require('prom-client');
 
-function createMetrics(config) {
+function createMetrics(_config) {
   const register = new promClient.Registry();
   promClient.collectDefaultMetrics({ register });
 
