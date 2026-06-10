@@ -1,6 +1,6 @@
 {
   "name": "express-starter-pro",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Production-ready Express.js application starter kit with Sequelize, metrics, logging, and CLI scaffolding",
   "main": "index.js",
   "exports": {
