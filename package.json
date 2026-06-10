@@ -10,7 +10,7 @@
     }
   },
   "bin": {
-    "express-starter-pro": "./cli.js"
+    "express-starter-pro": "cli.js"
   },
   "scripts": {
     "start": "node index.js",
@@ -37,6 +37,7 @@
   },
   "dependencies": {
     "compression": "^1.7.4",
+    "connect-redis": "^7.1.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
@@ -48,6 +49,7 @@
     "morgan": "^1.10.0",
     "on-finished": "^2.4.1",
     "prom-client": "^15.0.0",
+    "rate-limit-redis": "^4.1.0",
     "redis": "^4.6.0",
     "sequelize": "^6.35.0",
     "xss": "^1.0.14",

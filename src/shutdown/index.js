@@ -1,6 +1,7 @@
 'use strict';
 
-function createShutdownHandler(server, sequelize, redisClient, logger, config) {
+function createShutdownHandler(initialServer, sequelize, redisClient, logger, config) {
+  let server = initialServer;
   const timeout = config.shutdownTimeout || 30000;
   let isShuttingDown = false;
 
@@ -17,7 +18,19 @@ function createShutdownHandler(server, sequelize, redisClient, logger, config) {
 
     try {
       if (server) {
-        await new Promise((resolve) => server.close(resolve));
+        await new Promise((resolve, reject) => {
+          const timeoutId = setTimeout(() => {
+            logger.warn('Server close timed out, forcing');
+            resolve();
+          }, 10000);
+          server.close((err) => {
+            clearTimeout(timeoutId);
+            if (err) reject(err);
+            else resolve();
+          });
+          // Immediately stop accepting new connections
+          server.unref();
+        });
         logger.info('HTTP server closed');
       }
 
@@ -54,7 +67,11 @@ function createShutdownHandler(server, sequelize, redisClient, logger, config) {
     });
   }
 
-  return { shutdown, registerShutdownHandlers };
+  function setServer(newServer) {
+    server = newServer;
+  }
+
+  return { shutdown, registerShutdownHandlers, setServer };
 }
 
 module.exports = { createShutdownHandler };

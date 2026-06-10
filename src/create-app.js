@@ -21,10 +21,11 @@ const { createErrorHandler, notFoundHandler } = require('./middleware/error-hand
 const { createSequelize } = require('./sequelize');
 const { createTransactionMiddleware } = require('./sequelize/transaction');
 const { createShutdownHandler } = require('./shutdown');
+const { createSwaggerMiddleware } = require('./middleware/swagger');
 
 async function createApp(userConfig = {}) {
   // Extract non-config options before validation strips them
-  const { beforeRoutes } = userConfig;
+  const { beforeRoutes, afterRoutes } = userConfig;
   const config = loadConfig(userConfig);
 
   // Runtime validation: session requires sessionSecret
@@ -42,6 +43,21 @@ async function createApp(userConfig = {}) {
     req.log = logger;
     next();
   });
+
+  // Initialize Redis client if enabled
+  let redisClient;
+  if (config.redis && config.redis.enabled && config.redis.url) {
+    try {
+      const redis = require('redis');
+      redisClient = redis.createClient({ url: config.redis.url });
+      redisClient.on('error', (err) => logger.warn('Redis connection error', { error: err.message }));
+      await redisClient.connect();
+      logger.info('Redis client connected');
+    } catch (err) {
+      logger.warn('Redis connection failed, proceeding without Redis', { error: err.message });
+      redisClient = null;
+    }
+  }
 
   // 1. Request ID
   if (config.requestId !== false) {
@@ -72,9 +88,15 @@ async function createApp(userConfig = {}) {
     app.use(cookieParser(secret));
   }
 
-  // 6. Session
+  // 6. Session (with optional Redis store)
   if (config.session) {
+    let store;
+    if (redisClient) {
+      const RedisStore = require('connect-redis').default;
+      store = new RedisStore({ client: redisClient, prefix: 'session:' });
+    }
     app.use(session({
+      store,
       secret: config.sessionSecret,
       resave: false,
       saveUninitialized: false,
@@ -82,12 +104,21 @@ async function createApp(userConfig = {}) {
     }));
   }
 
-  // 7. Rate limit
+  // 7. Rate limit (with optional Redis store)
   if (config.rateLimit) {
     const rlOpts = typeof config.rateLimit === 'object' ? config.rateLimit : {};
+    let rateLimitStore;
+    if (redisClient && rlOpts.store !== false) {
+      const { RedisStore } = require('rate-limit-redis');
+      rateLimitStore = new RedisStore({
+        sendCommand: (...args) => redisClient.sendCommand(args),
+        prefix: 'ratelimit:',
+      });
+    }
     app.use(rateLimit({
       windowMs: rlOpts.windowMs || 15 * 60 * 1000,
       max: rlOpts.max || 100,
+      store: rateLimitStore,
       keyGenerator: (req) => {
         const ip = req.ip || req.connection.remoteAddress;
         const userId = req.session?.userId || req.user?.id;
@@ -100,8 +131,8 @@ async function createApp(userConfig = {}) {
     }));
   }
 
-  // 8. CSRF
-  app.use(createCsrfMiddleware(config));
+  // 8. CSRF (with optional Redis token tracking)
+  app.use(createCsrfMiddleware(config, redisClient));
 
   // 9. Body parsers
   app.use(express.json({ limit: config.jsonLimit }));
@@ -131,8 +162,8 @@ async function createApp(userConfig = {}) {
     app.use(express.static(staticPath));
   }
 
-  // 14. Cache
-  const cacheMiddleware = createCacheMiddleware(config);
+  // 14. Cache (with optional Redis backend + LRU eviction)
+  const cacheMiddleware = createCacheMiddleware(config, redisClient);
   if (config.cache && config.cache.enabled) {
     app.use(cacheMiddleware.cacheMiddleware);
   }
@@ -176,12 +207,21 @@ async function createApp(userConfig = {}) {
     beforeRoutes(app);
   }
 
-  // Built-in routes
-  app.get('/health', (req, res) => {
+  // Swagger / OpenAPI
+  const swaggerMiddleware = createSwaggerMiddleware(config);
+  if (swaggerMiddleware) {
+    app.use(swaggerMiddleware.middleware);
+  }
+
+  // Built-in routes (customizable health check paths)
+  const healthPath = config.healthCheck?.path || '/health';
+  const readyPath = config.healthCheck?.readyPath || '/ready';
+
+  app.get(healthPath, (req, res) => {
     res.json({ status: 'ok', uptime: process.uptime(), timestamp: new Date().toISOString() });
   });
 
-  app.get('/ready', async (req, res) => {
+  app.get(readyPath, async (req, res) => {
     try {
       if (sequelize) {
         await sequelize.authenticate();
@@ -202,14 +242,19 @@ async function createApp(userConfig = {}) {
     }
   });
 
+  // User-defined routes (injected after built-in routes)
+  if (typeof afterRoutes === 'function') {
+    afterRoutes(app);
+  }
+
   // 404 handler
   app.use(notFoundHandler);
 
   // Central error handler
   app.use(createErrorHandler(config));
 
-  // Shutdown
-  const { shutdown, registerShutdownHandlers } = createShutdownHandler(null, sequelize, null, logger, config);
+// Shutdown — server reference set later via setServer()
+  const { shutdown, registerShutdownHandlers, setServer } = createShutdownHandler(null, sequelize, redisClient, logger, config);
 
   registerShutdownHandlers();
 
@@ -219,6 +264,8 @@ async function createApp(userConfig = {}) {
     shutdown: () => shutdown('manual'),
     sequelize,
     metrics,
+    redisClient,
+    setServer,
   };
 }
 

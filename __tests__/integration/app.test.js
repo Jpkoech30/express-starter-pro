@@ -50,7 +50,7 @@ describe('Integration Tests', () => {
       timeout: 50,
       database: { sync: false },
       beforeRoutes: (app) => {
-        app.get('/slow', (req, res) => {
+        app.get('/slow', (_req, _res) => {
           // Never respond — let timeout fire
         });
       },
@@ -161,5 +161,160 @@ describe('Integration Tests', () => {
       .get('/health')
       .set('Origin', 'http://example.com');
     expect(res.headers['access-control-allow-origin']).toBe('*');
+  });
+
+  // --- New tests for improvements ---
+
+  test('customizable health check path', async () => {
+    appInstance = await createApp({
+      nodeEnv: 'test',
+      database: { sync: false },
+      healthCheck: { path: '/status' },
+    });
+    const res = await request(appInstance.app).get('/status');
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe('ok');
+  });
+
+  test('customizable ready check path', async () => {
+    appInstance = await createApp({
+      nodeEnv: 'test',
+      database: { sync: false },
+      healthCheck: { readyPath: '/live' },
+    });
+    const res = await request(appInstance.app).get('/live');
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe('ready');
+  });
+
+  test('afterRoutes hook runs after built-in routes', async () => {
+    let afterCalled = false;
+    appInstance = await createApp({
+      nodeEnv: 'test',
+      database: { sync: false },
+      afterRoutes: (app) => {
+        afterCalled = true;
+        app.get('/after-route', (req, res) => res.json({ from: 'after' }));
+      },
+    });
+    expect(afterCalled).toBe(true);
+    const res = await request(appInstance.app).get('/after-route');
+    expect(res.status).toBe(200);
+    expect(res.body.from).toBe('after');
+  });
+
+  test('beforeRoutes hook runs before built-in routes', async () => {
+    let beforeCalled = false;
+    appInstance = await createApp({
+      nodeEnv: 'test',
+      database: { sync: false },
+      beforeRoutes: (app) => {
+        beforeCalled = true;
+        app.get('/before-route', (req, res) => res.json({ from: 'before' }));
+      },
+    });
+    expect(beforeCalled).toBe(true);
+    const res = await request(appInstance.app).get('/before-route');
+    expect(res.status).toBe(200);
+    expect(res.body.from).toBe('before');
+  });
+
+  test('swagger endpoint returns spec when enabled', async () => {
+    appInstance = await createApp({
+      nodeEnv: 'test',
+      database: { sync: false },
+      swagger: { title: 'Test API', version: '2.0.0' },
+    });
+    const res = await request(appInstance.app).get('/api-docs');
+    expect(res.status).toBe(200);
+    expect(res.body.openapi).toBe('3.0.3');
+    expect(res.body.info.title).toBe('Test API');
+    expect(res.body.info.version).toBe('2.0.0');
+  });
+
+  test('swagger disabled by default', async () => {
+    appInstance = await createApp({ nodeEnv: 'test', database: { sync: false } });
+    const res = await request(appInstance.app).get('/api-docs');
+    expect(res.status).toBe(404);
+  });
+
+  test('setServer is exposed in result', async () => {
+    appInstance = await createApp({ nodeEnv: 'test', database: { sync: false } });
+    expect(typeof appInstance.setServer).toBe('function');
+  });
+
+  test('validation middleware rejects invalid body', async () => {
+    const { z } = require('zod');
+    const { createValidationMiddleware } = require('../../src/middleware/validation');
+
+    appInstance = await createApp({
+      nodeEnv: 'test',
+      database: { sync: false },
+      beforeRoutes: (app) => {
+        app.post('/validate', createValidationMiddleware({
+          body: z.object({ email: z.string().email() }),
+        }), (req, res) => {
+          res.json({ ok: true });
+        });
+      },
+    });
+
+    const res = await request(appInstance.app)
+      .post('/validate')
+      .send({ email: 'not-an-email' });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe('Validation failed');
+  });
+
+  test('validation middleware accepts valid body', async () => {
+    const { z } = require('zod');
+    const { createValidationMiddleware } = require('../../src/middleware/validation');
+
+    appInstance = await createApp({
+      nodeEnv: 'test',
+      database: { sync: false },
+      beforeRoutes: (app) => {
+        app.post('/validate', createValidationMiddleware({
+          body: z.object({ email: z.string().email() }),
+        }), (req, res) => {
+          res.json({ ok: true, email: req.body.email });
+        });
+      },
+    });
+
+    const res = await request(appInstance.app)
+      .post('/validate')
+      .send({ email: 'test@example.com' });
+    expect(res.status).toBe(200);
+    expect(res.body.ok).toBe(true);
+    expect(res.body.email).toBe('test@example.com');
+  });
+
+  test('cache with maxSize evicts old entries', async () => {
+    appInstance = await createApp({
+      nodeEnv: 'test',
+      cache: { ttl: 60, enabled: true, maxSize: 2 },
+      database: { sync: false },
+      beforeRoutes: (app) => {
+        let counter = 0;
+        app.get('/api/:id', (req, res) => {
+          counter++;
+          res.json({ id: req.params.id, count: counter });
+        });
+      },
+    });
+
+    const res1 = await request(appInstance.app).get('/api/a');
+    expect(res1.headers['x-cache']).toBe('MISS');
+
+    const res2 = await request(appInstance.app).get('/api/b');
+    expect(res2.headers['x-cache']).toBe('MISS');
+
+    const res3 = await request(appInstance.app).get('/api/c');
+    expect(res3.headers['x-cache']).toBe('MISS');
+
+    // 'a' should be evicted (LRU, maxSize=2) — next request is a MISS
+    const res4 = await request(appInstance.app).get('/api/a');
+    expect(res4.headers['x-cache']).toBe('MISS');
   });
 });

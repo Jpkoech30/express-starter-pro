@@ -109,6 +109,47 @@ coverage/
 dist/
 `);
 
+  // __tests__ directory
+  const testDir = path.join(targetDir, '__tests__');
+  fs.mkdirSync(testDir, { recursive: true });
+
+  // Basic test file
+  const testContent = `const request = require('supertest');
+const { createApp } = require('express-starter-kit');
+
+describe('Generated App', () => {
+  let appInstance;
+
+  afterEach(async () => {
+    if (appInstance && appInstance.shutdown) {
+      await appInstance.shutdown();
+    }
+  });
+
+  test('/health returns ok status', async () => {
+    appInstance = await createApp({ nodeEnv: 'test', database: { sync: false } });
+    const res = await request(appInstance.app).get('/health');
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe('ok');
+  });
+
+  test('/ready returns ready status', async () => {
+    appInstance = await createApp({ nodeEnv: 'test', database: { sync: false } });
+    const res = await request(appInstance.app).get('/ready');
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe('ready');
+  });
+
+  test('404 returns JSON error', async () => {
+    appInstance = await createApp({ nodeEnv: 'test', database: { sync: false } });
+    const res = await request(appInstance.app).get('/nonexistent');
+    expect(res.status).toBe(404);
+    expect(res.body.error).toBe('Not Found');
+  });
+});
+`;
+  fs.writeFileSync(path.join(testDir, 'app.test.js'), testContent);
+
   // src/index.js
   const srcDir = path.join(targetDir, 'src');
   fs.mkdirSync(srcDir, { recursive: true });

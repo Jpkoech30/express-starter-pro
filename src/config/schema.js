@@ -18,6 +18,7 @@ const configSchema = z.object({
   rateLimit: z.union([z.boolean(), z.object({
     windowMs: z.number().int().positive().optional(),
     max: z.number().int().positive().optional(),
+    store: z.union([z.string(), z.object({}).passthrough()]).optional(),
   }).passthrough()]).default({ windowMs: 900000, max: 100 }),
   session: z.boolean().default(false),
   jsonLimit: z.string().default('1mb'),
@@ -32,7 +33,9 @@ const configSchema = z.object({
   cache: z.union([z.boolean(), z.object({
     ttl: z.number().int().positive().optional(),
     enabled: z.boolean().optional(),
-  })]).default({ ttl: 60, enabled: false }),
+    maxSize: z.number().int().positive().optional(),
+    redisPrefix: z.string().optional(),
+  })]).default({ ttl: 60, enabled: false, maxSize: 500 }),
   logger: z.union([z.object({
     info: z.function(),
     warn: z.function(),
@@ -76,6 +79,20 @@ const configSchema = z.object({
   shutdownTimeout: z.number().int().positive().default(30000),
   models: z.string().default('models/**/*.js'),
   transactionMiddleware: z.boolean().default(false),
+  // New config options
+  healthCheck: z.object({
+    path: z.string().default('/health'),
+    readyPath: z.string().default('/ready'),
+  }).default({}),
+  swagger: z.union([z.boolean(), z.object({
+    title: z.string().optional(),
+    version: z.string().optional(),
+    description: z.string().optional(),
+    path: z.string().optional(),
+  })]).default(false),
+  validation: z.object({
+    enabled: z.boolean().default(false),
+  }).default({}),
 });
 
 function validateConfig(config) {

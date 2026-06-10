@@ -35,6 +35,8 @@ export interface RedisConfig {
 export interface CacheConfig {
   ttl?: number;
   enabled?: boolean;
+  maxSize?: number;
+  redisPrefix?: string;
 }
 
 export interface CompressionConfig {
@@ -45,7 +47,24 @@ export interface CompressionConfig {
 export interface RateLimitConfig {
   windowMs?: number;
   max?: number;
+  store?: string | Record<string, unknown>;
   [key: string]: unknown;
+}
+
+export interface HealthCheckConfig {
+  path?: string;
+  readyPath?: string;
+}
+
+export interface SwaggerConfig {
+  title?: string;
+  version?: string;
+  description?: string;
+  path?: string;
+}
+
+export interface ValidationConfig {
+  enabled?: boolean;
 }
 
 export interface LoggerInterface {
@@ -83,6 +102,11 @@ export interface AppConfig {
   shutdownTimeout?: number;
   models?: string;
   transactionMiddleware?: boolean;
+  beforeRoutes?: (app: Express) => void;
+  afterRoutes?: (app: Express) => void;
+  healthCheck?: HealthCheckConfig;
+  swagger?: boolean | SwaggerConfig;
+  validation?: ValidationConfig;
 }
 
 export interface MetricsInterface {
@@ -106,6 +130,8 @@ export interface CreateAppResult {
   shutdown: () => Promise<void>;
   sequelize?: Sequelize;
   metrics: MetricsInterface;
+  redisClient?: import('redis').RedisClientType | null;
+  setServer?: (server: import('http').Server) => void;
 }
 
 declare module 'express-serve-static-core' {
