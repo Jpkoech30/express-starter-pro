@@ -6,3 +6,8 @@ config/
 .prettierrc
 jest.config.js
 nodemon.json
+coverage/
+k8s/
+docker/
+.github/
+plans/
