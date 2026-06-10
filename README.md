@@ -1,8 +1,8 @@
 # express-starter-pro
 
 [![npm version](https://img.shields.io/npm/v/express-starter-pro)](https://www.npmjs.com/package/express-starter-pro)
-[![Tests](https://github.com/LevisKip/express-starter-pro/actions/workflows/ci.yml/badge.svg)](https://github.com/LevisKip/express-starter-pro/actions/workflows/ci.yml)
-[![Coverage](https://img.shields.io/codecov/c/github/LevisKip/express-starter-pro)](https://codecov.io/gh/LevisKip/express-starter-pro)
+[![Tests](https://github.com/Jpkoech30/express-starter-pro/actions/workflows/ci.yml/badge.svg)](https://github.com/Jpkoech30/express-starter-pro/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/codecov/c/github/Jpkoech30/express-starter-pro)](https://codecov.io/gh/Jpkoech30/express-starter-pro)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Production-ready Express.js application starter kit with Sequelize, Prometheus metrics, structured logging, and CLI scaffolding.
