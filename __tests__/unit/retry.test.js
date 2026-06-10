@@ -6,7 +6,7 @@ describe('Retry Logic with Exponential Backoff', () => {
     return async () => {
       attempts++;
       if (attempts <= failCount) {
-        const delay = backoffBase * Math.pow(backoffExponent, attempts - 1);
+        const delay = backoffBase * backoffExponent ** (attempts - 1);
         await new Promise((r) => setTimeout(r, delay));
         throw new Error(`Attempt ${attempts} failed`);
       }
@@ -24,7 +24,7 @@ describe('Retry Logic with Exponential Backoff', () => {
       } catch (err) {
         lastError = err;
         if (attempt < max) {
-          const delay = backoffBase * Math.pow(backoffExponent, attempt - 1);
+          const delay = backoffBase * backoffExponent ** (attempt - 1);
           await new Promise((r) => setTimeout(r, delay));
         }
       }

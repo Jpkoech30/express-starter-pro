@@ -2,6 +2,12 @@ module.exports = {
   env: { node: true, es2021: true, jest: true },
   extends: 'airbnb-base',
   parserOptions: { ecmaVersion: 'latest', sourceType: 'script' },
+  overrides: [
+    {
+      files: ['*.mjs'],
+      parserOptions: { sourceType: 'module' },
+    },
+  ],
   rules: {
     'no-console': 'off',
     'no-param-reassign': ['error', { props: false }],
@@ -11,5 +17,18 @@ module.exports = {
     'consistent-return': 'off',
     'no-underscore-dangle': 'off',
     'class-methods-use-this': 'off',
+    'linebreak-style': 'off',
+    strict: 'off',
+    'no-promise-executor-return': 'off',
+    'no-plusplus': 'off',
+    'no-await-in-loop': 'off',
+    'no-shadow': 'off',
+    'global-require': 'off',
+    'import/no-dynamic-require': 'off',
+    'no-use-before-define': 'off',
+    'no-restricted-syntax': 'off',
+    'default-case': 'off',
+    'import/extensions': 'off',
+    'import/prefer-default-export': 'off',
   },
 };

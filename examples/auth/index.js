@@ -1,7 +1,7 @@
-const { createApp } = require('../../index');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { DataTypes } = require('sequelize');
+const { createApp } = require('../../index');
 
 async function main() {
   const { app, ready, sequelize } = await createApp({

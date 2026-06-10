@@ -1,6 +1,8 @@
 'use strict';
 
-const LEVELS = { error: 0, warn: 1, info: 2, debug: 3 };
+const LEVELS = {
+  error: 0, warn: 1, info: 2, debug: 3,
+};
 
 function createLogger(config) {
   if (config.logger) {
@@ -46,12 +48,14 @@ function createConsoleLogger(config) {
     };
 
     if (isProd) {
-      process.stdout.write(JSON.stringify(entry) + '\n');
+      process.stdout.write(`${JSON.stringify(entry)}\n`);
     } else {
       const prefix = `[${entry.timestamp}] [${levelName.toUpperCase()}]`;
       const reqId = meta.reqId ? ` [req:${meta.reqId}]` : '';
       const stack = meta.stack ? `\n${meta.stack}` : '';
-      const colorMap = { error: 31, warn: 33, info: 36, debug: 90 };
+      const colorMap = {
+        error: 31, warn: 33, info: 36, debug: 90,
+      };
       const color = colorMap[levelName] || 0;
       process.stdout.write(`\x1b[${color}m${prefix}${reqId}\x1b[0m ${msg}${stack}\n`);
       if (Object.keys(meta).length > 0 && !meta.reqId && !meta.stack) {

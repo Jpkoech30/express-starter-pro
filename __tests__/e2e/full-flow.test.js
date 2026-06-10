@@ -85,8 +85,7 @@ describe('E2E: Full Request Flow with Sequelize (SQLite)', () => {
       logLevel: 'error',
     });
 
-    const promises = Array.from({ length: 10 }, () =>
-      request(appInstance.app).get('/health'));
+    const promises = Array.from({ length: 10 }, () => request(appInstance.app).get('/health'));
     const results = await Promise.all(promises);
     results.forEach((res) => {
       expect(res.status).toBe(200);

@@ -21,7 +21,7 @@ const TEMPLATES = {
     dependencies: {
       express: '^4.18.2',
       bcrypt: '^5.1.0',
-      'jsonwebtoken': '^9.0.0',
+      jsonwebtoken: '^9.0.0',
       'socket.io': '^4.7.0',
       redis: '^4.6.0',
     },
@@ -71,11 +71,11 @@ function generateProject(projectName, options) {
   };
 
   if (dbDialect === 'sqlite') {
-    pkg.dependencies['sqlite3'] = '^5.1.0';
+    pkg.dependencies.sqlite3 = '^5.1.0';
   } else if (dbDialect === 'mysql') {
-    pkg.dependencies['mysql2'] = '^3.6.0';
+    pkg.dependencies.mysql2 = '^3.6.0';
   } else {
-    pkg.dependencies['pg'] = '^8.11.0';
+    pkg.dependencies.pg = '^8.11.0';
     pkg.dependencies['pg-hstore'] = '^2.3.4';
   }
 
@@ -124,7 +124,7 @@ async function main() {
       dialect: '${dbDialect}',
       sync: { alter: true },
     },
-    ${useRedis ? "redis: { url: process.env.REDIS_URL, enabled: true }," : ''}
+    ${useRedis ? 'redis: { url: process.env.REDIS_URL, enabled: true },' : ''}
     sessionSecret: process.env.SESSION_SECRET,
   });
 

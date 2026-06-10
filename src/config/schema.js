@@ -3,12 +3,14 @@
 const { z } = require('zod');
 
 const configSchema = z.object({
-  port: z.number().int().positive().max(65535).default(3000),
+  port: z.number().int().positive().max(65535)
+    .default(3000),
   nodeEnv: z.enum(['development', 'production', 'test']).default('development'),
   helmet: z.union([z.boolean(), z.object({}).passthrough()]).default(true),
   cors: z.union([z.boolean(), z.object({}).passthrough()]).default(true),
   compression: z.union([z.boolean(), z.object({
-    level: z.number().int().min(1).max(9).optional(),
+    level: z.number().int().min(1).max(9)
+      .optional(),
     threshold: z.number().int().positive().optional(),
   }).passthrough()]).default({ level: 6, threshold: 1024 }),
   morgan: z.union([z.boolean(), z.string()]).default('dev'),
@@ -62,7 +64,8 @@ const configSchema = z.object({
       alter: z.boolean().optional(),
       force: z.boolean().optional(),
     })]).default(false),
-    queryTimeout: z.number().int().positive().nullable().default(null),
+    queryTimeout: z.number().int().positive().nullable()
+      .default(null),
     logging: z.union([z.boolean(), z.function()]).default(false),
   }).default({}),
   redis: z.object({

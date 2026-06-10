@@ -45,7 +45,7 @@ async function createSequelize(config, logger) {
     } catch (err) {
       lastError = err;
       if (attempt < retryConfig.max) {
-        const delay = retryConfig.backoffBase * Math.pow(retryConfig.backoffExponent, attempt - 1);
+        const delay = retryConfig.backoffBase * retryConfig.backoffExponent ** (attempt - 1);
         logger.warn(`Database connection attempt ${attempt}/${retryConfig.max} failed, retrying in ${delay}ms`);
         await new Promise((r) => setTimeout(r, delay));
       }

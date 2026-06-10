@@ -26,7 +26,9 @@ const defaults = {
     url: process.env.DATABASE_URL || null,
     dialect: 'sqlite',
     storage: ':memory:',
-    pool: { max: 10, min: 0, acquire: 30000, idle: 10000 },
+    pool: {
+      max: 10, min: 0, acquire: 30000, idle: 10000,
+    },
     retry: { max: 3, backoffBase: 100, backoffExponent: 2 },
     sync: false,
     queryTimeout: null,

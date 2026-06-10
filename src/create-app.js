@@ -24,7 +24,7 @@ const { createShutdownHandler } = require('./shutdown');
 
 async function createApp(userConfig = {}) {
   // Extract non-config options before validation strips them
-  const beforeRoutes = userConfig.beforeRoutes;
+  const { beforeRoutes } = userConfig;
   const config = loadConfig(userConfig);
 
   // Runtime validation: session requires sessionSecret
@@ -209,9 +209,7 @@ async function createApp(userConfig = {}) {
   app.use(createErrorHandler(config));
 
   // Shutdown
-  const { shutdown, registerShutdownHandlers } = createShutdownHandler(
-    null, sequelize, null, logger, config,
-  );
+  const { shutdown, registerShutdownHandlers } = createShutdownHandler(null, sequelize, null, logger, config);
 
   registerShutdownHandlers();
 
