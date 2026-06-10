@@ -1,8 +1,8 @@
-# express-starter-kit
+# express-starter-pro
 
-[![npm version](https://img.shields.io/npm/v/express-starter-kit)](https://www.npmjs.com/package/express-starter-kit)
-[![Tests](https://github.com/user/express-starter-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/user/express-starter-kit/actions/workflows/ci.yml)
-[![Coverage](https://img.shields.io/codecov/c/github/user/express-starter-kit)](https://codecov.io/gh/user/express-starter-kit)
+[![npm version](https://img.shields.io/npm/v/express-starter-pro)](https://www.npmjs.com/package/express-starter-pro)
+[![Tests](https://github.com/LevisKip/express-starter-pro/actions/workflows/ci.yml/badge.svg)](https://github.com/LevisKip/express-starter-pro/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/codecov/c/github/LevisKip/express-starter-pro)](https://codecov.io/gh/LevisKip/express-starter-pro)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Production-ready Express.js application starter kit with Sequelize, Prometheus metrics, structured logging, and CLI scaffolding.
@@ -10,13 +10,13 @@ Production-ready Express.js application starter kit with Sequelize, Prometheus m
 ## Installation
 
 ```bash
-npm install express-starter-kit
+npm install express-starter-pro
 ```
 
 ## Quick Start
 
 ```javascript
-const { createApp } = require('express-starter-kit');
+const { createApp } = require('express-starter-pro');
 
 async function main() {
   const { app, ready } = await createApp({ port: 3000 });
@@ -88,7 +88,7 @@ Returns `Promise<{ app, ready, shutdown, sequelize, metrics }>`
 ## CLI Usage
 
 ```bash
-npx express-starter-kit init <projectName> [options]
+npx express-starter-pro init <projectName> [options]
 ```
 
 ### Options
@@ -104,13 +104,13 @@ npx express-starter-kit init <projectName> [options]
 
 ```bash
 # Basic project
-npx express-starter-kit init my-app
+npx express-starter-pro init my-app
 
 # Auth template with MySQL
-npx express-starter-kit init my-app --template auth --db mysql
+npx express-starter-pro init my-app --template auth --db mysql
 
 # Full stack with Redis
-npx express-starter-kit init my-app --template full --redis
+npx express-starter-pro init my-app --template full --redis
 ```
 
 ## Environment Variables
@@ -175,7 +175,7 @@ kubectl apply -f k8s/deployment.yaml
 
 ## Migration Guide from Vanilla Express
 
-1. Install: `npm install express-starter-kit`
+1. Install: `npm install express-starter-pro`
 2. Replace `const app = express()` with `const { app, ready } = await createApp(config)`
 3. Remove manual middleware setup (helmet, cors, etc.)
 4. Add `await ready` before `app.listen()`

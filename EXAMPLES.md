@@ -3,7 +3,7 @@
 ## Basic Server
 
 ```javascript
-const { createApp } = require('express-starter-kit');
+const { createApp } = require('express-starter-pro');
 
 async function main() {
   const { app, ready } = await createApp({
@@ -21,7 +21,7 @@ main().catch(console.error);
 ## JWT Authentication
 
 ```javascript
-const { createApp } = require('express-starter-kit');
+const { createApp } = require('express-starter-pro');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 

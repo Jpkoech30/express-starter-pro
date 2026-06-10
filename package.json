@@ -1,5 +1,5 @@
 {
-  "name": "express-starter-kit",
+  "name": "express-starter-pro",
   "version": "1.0.0",
   "description": "Production-ready Express.js application starter kit with Sequelize, metrics, logging, and CLI scaffolding",
   "main": "index.js",
@@ -10,7 +10,7 @@
     }
   },
   "bin": {
-    "express-starter-kit": "./cli.js"
+    "express-starter-pro": "./cli.js"
   },
   "scripts": {
     "start": "node index.js",

@@ -33,5 +33,5 @@ jobs:
     needs: test
     steps:
       - uses: actions/checkout@v4
-      - run: docker build -t express-starter-kit -f docker/Dockerfile .
-      - run: docker run --rm express-starter-kit node -e "require('./index'); console.log('OK')"
+      - run: docker build -t express-starter-pro -f docker/Dockerfile .
+      - run: docker run --rm express-starter-pro node -e "require('./index'); console.log('OK')"
